@@ -1,36 +1,28 @@
 import express from 'express';
 import { AdsenseController } from '../controllers/adsense.controller.js';
 import { ReportingController } from '../controllers/reporting.controller.js';
-import { requireAuth } from '../middleware/auth.middleware.js';
+import { authenticate, requireAdminAdsenseAuth } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
+// Check admin auth status (no user auth required)
 router.get('/auth/check', AdsenseController.checkAuth);
 
-// ============================================
+// All routes below require user authentication AND admin AdSense auth
+router.use(authenticate);
+router.use(requireAdminAdsenseAuth);
+
 // Basic Data Routes
-// ============================================
-router.get('/accounts', requireAuth, AdsenseController.getAccounts);
-router.get('/sites/:accountId', requireAuth, AdsenseController.getSites);
-router.get('/adunits/:accountId', requireAuth, AdsenseController.getAdUnits);
-router.get('/earnings/:accountId', requireAuth, AdsenseController.getEarnings);
-router.get('/payments/:accountId', requireAuth, AdsenseController.getPayments);
-router.get('/alerts/:accountId', requireAuth, AdsenseController.getAlerts);
+router.get('/accounts', AdsenseController.getAccounts);
+router.get('/sites/:accountId', AdsenseController.getSites);
+router.get('/adunits/:accountId', AdsenseController.getAdUnits);
+router.get('/earnings/:accountId', AdsenseController.getEarnings);
+router.get('/payments/:accountId', AdsenseController.getPayments);
+router.get('/alerts/:accountId', AdsenseController.getAlerts);
 
-// ============================================
 // Enhanced Reporting Routes
-// ============================================
-
-// Get comprehensive website report with all metrics
-// Query params: startDate (YYYY-MM-DD), endDate (YYYY-MM-DD), groupBy (DATE|DOMAIN)
-router.get('/reports/websites/:accountId', requireAuth, ReportingController.getWebsiteReport);
-
-// Get site-specific detailed report
-// Query params: startDate (YYYY-MM-DD), endDate (YYYY-MM-DD)
-router.get('/reports/site/:accountId/:siteId', requireAuth, ReportingController.getSiteReport);
-
-// Get dashboard summary with key metrics
-// Query params: startDate (YYYY-MM-DD), endDate (YYYY-MM-DD)
-router.get('/reports/dashboard/:accountId', requireAuth, ReportingController.getDashboard);
+router.get('/reports/websites/:accountId', ReportingController.getWebsiteReport);
+router.get('/reports/site/:accountId/:siteId', ReportingController.getSiteReport);
+router.get('/reports/dashboard/:accountId', ReportingController.getDashboard);
 
 export default router;

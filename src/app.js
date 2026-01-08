@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import authRoutes from './routes/auth.routes.js';
 import adsenseRoutes from './routes/adsense.routes.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.middleware.js';
 import { createRateLimiter } from './middleware/rateLimiter.middleware.js';
@@ -22,9 +23,9 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 const corsOptions = {
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true,
-  methods: ['GET', 'POST'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  maxAge: 86400 // 24 hours
+  maxAge: 86400
 };
 
 app.use(cors(corsOptions));
@@ -39,6 +40,7 @@ app.use((req, res, next) => {
 });
 
 // Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/adsense', adsenseRoutes);
 
 // Health check

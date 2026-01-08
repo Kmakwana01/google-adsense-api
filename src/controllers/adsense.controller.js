@@ -43,7 +43,7 @@ export class AdsenseController {
 
   static async getAccounts(req, res) {
     try {
-      const data = await AdsenseService.getAccounts(req.tokens);
+      const data = await AdsenseService.getAccounts(req.adsenseTokens);
       res.json({
         success: true,
         data: data,
@@ -74,7 +74,7 @@ export class AdsenseController {
         });
       }
 
-      const data = await AdsenseService.getSites(accountId, req.tokens);
+      const data = await AdsenseService.getSites(accountId, req.adsenseTokens);
       res.json({
         success: true,
         data: data,
@@ -105,7 +105,7 @@ export class AdsenseController {
         });
       }
 
-      const data = await AdsenseService.getAdUnits(accountId, req.tokens);
+      const data = await AdsenseService.getAdUnits(accountId, req.adsenseTokens);
       res.json({
         success: true,
         data: data,
@@ -154,7 +154,7 @@ export class AdsenseController {
         accountId,
         startDate,
         endDate,
-        req.tokens,
+        req.adsenseTokens,
         metricsArray
       );
 
@@ -188,7 +188,7 @@ export class AdsenseController {
         });
       }
 
-      const data = await AdsenseService.getPayments(accountId, req.tokens);
+      const data = await AdsenseService.getPayments(accountId, req.adsenseTokens);
       res.json({
         success: true,
         data: data,
@@ -219,7 +219,7 @@ export class AdsenseController {
         });
       }
 
-      const data = await AdsenseService.getAlerts(accountId, req.tokens);
+      const data = await AdsenseService.getAlerts(accountId, req.adsenseTokens);
       res.json({
         success: true,
         data: data,

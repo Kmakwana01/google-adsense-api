@@ -70,7 +70,7 @@ export class ReportingController {
         accountId,
         startDate,
         endDate,
-        req.tokens,
+        req.adsenseTokens,
         metrics,
         dimensions
       );
@@ -115,12 +115,47 @@ export class ReportingController {
     try {
       const { accountId, siteId } = req.params;
       const { startDate, endDate } = req.query;
+      const user = req.user;
+
+      console.log('req.params :>> ', req.params);
 
       if (!accountId || !siteId || !startDate || !endDate) {
         return res.status(CONSTANTS.HTTP_STATUS.BAD_REQUEST).json({
           success: false,
           error: CONSTANTS.ERRORS.INVALID_PARAMS,
           message: "accountId, siteId, startDate, and endDate are required",
+        });
+      }
+
+      // Check if the site belongs to the current user
+      const userSite = user.websites.find(
+        (website) =>
+          website.siteId === siteId &&
+          website.accountId === accountId &&
+          website.isActive
+      );
+
+      if (!userSite) {
+        logger.warn("User attempted to access unauthorized site", {
+          userId: user._id,
+          accountId,
+          siteId,
+        });
+        return res.status(CONSTANTS.HTTP_STATUS.FORBIDDEN).json({
+          success: false,
+          error: "Access denied",
+          message:
+            "You don't have access to this site or the site doesn't exist in your account",
+        });
+      }
+
+      // Validate date format
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!dateRegex.test(startDate) || !dateRegex.test(endDate)) {
+        return res.status(CONSTANTS.HTTP_STATUS.BAD_REQUEST).json({
+          success: false,
+          error: CONSTANTS.ERRORS.INVALID_PARAMS,
+          message: "Dates must be in YYYY-MM-DD format",
         });
       }
 
@@ -136,10 +171,10 @@ export class ReportingController {
 
       const data = await AdsenseService.getSiteEarningsReport(
         accountId,
-        siteId,
+        userSite.domain, // Use the domain from user's website data
         startDate,
         endDate,
-        req.tokens,
+        req.adsenseTokens,
         metrics
       );
 
@@ -149,6 +184,12 @@ export class ReportingController {
       res.json({
         success: true,
         data: {
+          siteInfo: {
+            domain: userSite.domain,
+            siteId: userSite.siteId,
+            accountId: userSite.accountId,
+            addedAt: userSite.addedAt,
+          },
           summary,
           byDate: rows,
         },
@@ -198,8 +239,6 @@ export class ReportingController {
       summary.totalPageViews += pv;
       summary.totalAdRequests += req;
 
-      // For averages, accumulate then divide by number of non‑zero days if you prefer,
-      // here simple arithmetic mean over all days:
       summary.averageCPC += cpc;
       summary.averageRPM += rpm;
     });
@@ -220,7 +259,6 @@ export class ReportingController {
 
     return summary;
   }
-
 
   /**
    * Get summary dashboard data
@@ -245,12 +283,12 @@ export class ReportingController {
           accountId,
           startDate,
           endDate,
-          req.tokens,
+          req.adsenseTokens,
           ["ESTIMATED_EARNINGS", "IMPRESSIONS", "CLICKS", "PAGE_VIEWS_RPM"],
           ["DATE", "DOMAIN_NAME"]
         ),
-        AdsenseService.getSites(accountId, req.tokens),
-        AdsenseService.getAlerts(accountId, req.tokens),
+        AdsenseService.getSites(accountId, req.adsenseTokens),
+        AdsenseService.getAlerts(accountId, req.adsenseTokens),
       ]);
 
       const dashboard = ReportingController.buildDashboard(
