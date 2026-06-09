@@ -1,0 +1,778 @@
+{
+    "info": {
+        "_postman_id": "aa123456-7890-1234-5678-90abcdef1234",
+        "name": "Google AdSense API",
+        "description": "Production-grade Postman collection for the Google AdSense Dashboard API. Includes Authentication, AdSense data fetching, and Reporting endpoints.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:5000/api",
+            "type": "string"
+        },
+        {
+            "key": "token",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "refreshToken",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "adminAccountId",
+            "value": "pub-1234567890",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "Auth",
+            "item": [
+                {
+                    "name": "Register",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.collectionVariables.set(\"token\", jsonData.data.accessToken);",
+                                    "    pm.collectionVariables.set(\"refreshToken\", jsonData.data.refreshToken);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Test User\",\n    \"email\": \"test@example.com\",\n    \"password\": \"Test@1234\",\n    \"confirmPassword\": \"Test@1234\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/register",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "register"
+                            ]
+                        },
+                        "description": "Register a new user."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Login",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.collectionVariables.set(\"token\", jsonData.data.accessToken);",
+                                    "    pm.collectionVariables.set(\"refreshToken\", jsonData.data.refreshToken);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"Test@1234\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/login",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "login"
+                            ]
+                        },
+                        "description": "Login user and get JWT tokens."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Refresh Token",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.collectionVariables.set(\"token\", jsonData.data.accessToken);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"refreshToken\": \"{{refreshToken}}\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/refresh-token",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "refresh-token"
+                            ]
+                        },
+                        "description": "Get a new access token using the refresh token."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Profile",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/profile",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "profile"
+                            ]
+                        },
+                        "description": "Get current user profile."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Profile",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PATCH",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Updated Name\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/profile",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "profile"
+                            ]
+                        },
+                        "description": "Update user profile details."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Change Password",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PATCH",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"currentPassword\": \"Test@1234\",\n    \"newPassword\": \"New@1234\",\n    \"confirmNewPassword\": \"New@1234\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/change-password",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "change-password"
+                            ]
+                        },
+                        "description": "Change user password."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Logout",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/logout",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "logout"
+                            ]
+                        },
+                        "description": "Logout user and invalidate refresh token."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Add Website",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"domain\": \"example.com\",\n    \"siteId\": \"sites/example.com\",\n    \"accountId\": \"{{adminAccountId}}\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/websites",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "websites"
+                            ]
+                        },
+                        "description": "Add a website to the user's account for reporting."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Remove Website",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/websites/:domain",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "websites",
+                                ":domain"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "domain",
+                                    "value": "example.com"
+                                }
+                            ]
+                        },
+                        "description": "Remove a website from the user's account."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "AdSense",
+            "item": [
+                {
+                    "name": "Check Admin Auth",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/adsense/auth/check",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "adsense",
+                                "auth",
+                                "check"
+                            ]
+                        },
+                        "description": "Check if the server has valid Google AdSense admin tokens."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Accounts",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/adsense/accounts",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "adsense",
+                                "accounts"
+                            ]
+                        },
+                        "description": "List all AdSense accounts accessible by the admin."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Sites",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/adsense/sites/:accountId",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "adsense",
+                                "sites",
+                                ":accountId"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "accountId",
+                                    "value": "{{adminAccountId}}"
+                                }
+                            ]
+                        },
+                        "description": "List all sites for a specific AdSense account."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Ad Units",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/adsense/adunits/:accountId",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "adsense",
+                                "adunits",
+                                ":accountId"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "accountId",
+                                    "value": "{{adminAccountId}}"
+                                }
+                            ]
+                        },
+                        "description": "List all ad units for a specific AdSense account."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Earnings",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/adsense/earnings/:accountId?startDate=2024-01-01&endDate=2024-01-31",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "adsense",
+                                "earnings",
+                                ":accountId"
+                            ],
+                            "query": [
+                                {
+                                    "key": "startDate",
+                                    "value": "2024-01-01"
+                                },
+                                {
+                                    "key": "endDate",
+                                    "value": "2024-01-31"
+                                },
+                                {
+                                    "key": "metrics",
+                                    "value": "ESTIMATED_EARNINGS,IMPRESSIONS,CLICKS",
+                                    "disabled": true
+                                }
+                            ],
+                            "variable": [
+                                {
+                                    "key": "accountId",
+                                    "value": "{{adminAccountId}}"
+                                }
+                            ]
+                        },
+                        "description": "Get earnings report for a date range."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Payments",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/adsense/payments/:accountId",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "adsense",
+                                "payments",
+                                ":accountId"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "accountId",
+                                    "value": "{{adminAccountId}}"
+                                }
+                            ]
+                        },
+                        "description": "List payments for a specific AdSense account."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Alerts",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/adsense/alerts/:accountId",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "adsense",
+                                "alerts",
+                                ":accountId"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "accountId",
+                                    "value": "{{adminAccountId}}"
+                                }
+                            ]
+                        },
+                        "description": "List alerts for a specific AdSense account."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Reporting",
+            "item": [
+                {
+                    "name": "Website Report",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/adsense/reports/websites/:accountId?startDate=2024-01-01&endDate=2024-01-31&groupBy=DATE",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "adsense",
+                                "reports",
+                                "websites",
+                                ":accountId"
+                            ],
+                            "query": [
+                                {
+                                    "key": "startDate",
+                                    "value": "2024-01-01"
+                                },
+                                {
+                                    "key": "endDate",
+                                    "value": "2024-01-31"
+                                },
+                                {
+                                    "key": "groupBy",
+                                    "value": "DATE",
+                                    "description": "Optional: DATE (default), DOMAIN, SITE"
+                                }
+                            ],
+                            "variable": [
+                                {
+                                    "key": "accountId",
+                                    "value": "{{adminAccountId}}"
+                                }
+                            ]
+                        },
+                        "description": "Get detailed website performance reports."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Site Specific Report",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/adsense/reports/site/:accountId/:siteId?startDate=2024-01-01&endDate=2024-01-31",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "adsense",
+                                "reports",
+                                "site",
+                                ":accountId",
+                                ":siteId"
+                            ],
+                            "query": [
+                                {
+                                    "key": "startDate",
+                                    "value": "2024-01-01"
+                                },
+                                {
+                                    "key": "endDate",
+                                    "value": "2024-01-31"
+                                }
+                            ],
+                            "variable": [
+                                {
+                                    "key": "accountId",
+                                    "value": "{{adminAccountId}}"
+                                },
+                                {
+                                    "key": "siteId",
+                                    "value": "sites/example.com"
+                                }
+                            ]
+                        },
+                        "description": "Get detailed report for a specific site (must be added to user's account)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Dashboard Summary",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/adsense/reports/dashboard/:accountId?startDate=2024-01-01&endDate=2024-01-31",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "adsense",
+                                "reports",
+                                "dashboard",
+                                ":accountId"
+                            ],
+                            "query": [
+                                {
+                                    "key": "startDate",
+                                    "value": "2024-01-01"
+                                },
+                                {
+                                    "key": "endDate",
+                                    "value": "2024-01-31"
+                                }
+                            ],
+                            "variable": [
+                                {
+                                    "key": "accountId",
+                                    "value": "{{adminAccountId}}"
+                                }
+                            ]
+                        },
+                        "description": "Get dashboard summary including earnings, top websites, and recent trends."
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ]
+}
